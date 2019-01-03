@@ -1,5 +1,5 @@
 import csv
-
+import numpy as np
 
 ########################### Data Normalization ############################
 def normalize(file_name):
@@ -118,7 +118,26 @@ def make_neural_net(file_name):
 								different years or whatever.
 	runtime: long :))
 	'''
-	
+	TRAINING_PROPORTION = .8 # the proportion of the data used for training
+		
+	normalized_data = np.array(normalize(file_name))
+	np.random.shuffle(normalized_data) # shuffle the rows randomly
 
+	num_training = int(TRAINING_PROPORTION*(normalized_data.shape[0])) # number of training rows
+	num_test = normalized_data.shape[0]-num_training # number of test rows
+	training_data, test_data = normalized_data[:num_training+1], normalized_data[num_training+1:]
+	training_features, test_features = training_data[:, [i for i in range(27)]], test_data[:, [i for i in range(27)]]
+	training_labels, test_labels = training_data[:, [27]], test_data[:, [27]]
+	# print('Original data, split into training and test:')
+	# print(training_data.shape)
+	# print(test_data.shape)
+	# print('\nFeatures:')
+	# print(training_features.shape)
+	# print(test_features.shape)
+	# print('\nLabels')
+	# print(training_labels.shape)
+	# print(test_labels.shape)
+	
+	
 if __name__ == '__main__':
-	pass
+	make_neural_net('Mike Trout.csv')
