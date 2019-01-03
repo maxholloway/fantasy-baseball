@@ -117,7 +117,11 @@ def batter_to_csv(player_name, urls):
 		
 	def get_pitcher_data(pitcher_last_name, pitcher_team_name, pitcher_year):
 		'''
-		inputs: 
+		inputs: self explanatory; they're all strings, too
+		outputs: a row with the specified pitcher's data for the specified year
+						 and team
+		how it works: basically it goes through a csv file and finds the pitcherf
+		'''
 		# Make all lowercase for the .csv file format
 		pitcher_last_name = pitcher_last_name.lower()
 		# Make copy of pitcher data
@@ -212,6 +216,7 @@ def batter_to_csv(player_name, urls):
 					output += [score]
 				# End of making output
 				
+				# append features and output, in that order, to the csv file
 				csv_writer.writerow([features + output])
 
 		
@@ -228,6 +233,12 @@ def make_csv_files(player_names):
 
 if __name__ == '__main__':
 	urlsForTrout = ['https://www.retrosheet.org/boxesetc/2011/Itroum0010012011.htm',
-									'https://www.retrosheet.org/boxesetc/2012/Itroum0010022012.htm']
+									'https://www.retrosheet.org/boxesetc/2012/Itroum0010022012.htm',
+									'https://www.retrosheet.org/boxesetc/2013/Itroum0010032013.htm',
+									'https://www.retrosheet.org/boxesetc/2014/Itroum0010042014.htm',
+									'https://www.retrosheet.org/boxesetc/2015/Itroum0010052015.htm',
+									'https://www.retrosheet.org/boxesetc/2016/Itroum0010062016.htm',
+									'https://www.retrosheet.org/boxesetc/2017/Itroum0010072017.htm',
+									'https://www.retrosheet.org/boxesetc/2018/Itroum0010082018.htm']
 	name_for_trout = 'Mike Trout'
 	batter_to_csv(name_for_trout, urlsForTrout)
