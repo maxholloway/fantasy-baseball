@@ -18,7 +18,7 @@ abbreviation_to_team = {'ANA': 'Anaheim Angels', 'ARI': 'Arizona Diamondbacks',
 												'SEA': 'Seattle Mariners', 'SF': 'San Francisco Giants',
 												'STL': 'St. Louis Cardinals', 'TB': 'Tampa Bay Rays',
 												'TEX': 'Texas Rangers', 'TOR': 'Toronto Blue Jays',
-												'WSH': 'Washington Nationals'}
+												'WSH': 'Washington Nationals', 'WAS': 'Washington Nationals'}
 
 lahman_abbrev_to_team = {'LAA': 'Anaheim Angels', 'ARI': 'Arizona Diamondbacks',
 												'ATL': 'Atlanta Braves', 'BAL': 'Baltimore Orioles',
@@ -140,9 +140,10 @@ def batter_to_csv(player_name, urls):
 		
 		new_pitcher_data = list(filter((lambda x: team_abbrev == x[3]), new_pitcher_data))
 		
-		assert(len(list(new_pitcher_data)) == 1) # asserting that there's only one pitcher on this team, this year, of this name
-
-		return new_pitcher_data[0]
+		if(len(list(new_pitcher_data)) == 1): # asserting that there's only one pitcher on this team, this year, of this name
+			return new_pitcher_data[0]
+		else:
+			return None 
 	
 	for i in range(len(urls)):
 		response = requests.get(urls[i])
@@ -197,11 +198,16 @@ def batter_to_csv(player_name, urls):
 				opposing_team_abbrev = rest_of_data[0]
 				opposing_team = abbreviation_to_team[opposing_team_abbrev]
 				pitcher_last_name = game_to_pitcher_last_name(game_link, opposing_team)
+
 				pitcher =  get_pitcher_data(pitcher_last_name, opposing_team, year)
-				win_loss_ratio = int(pitcher[5])/int(pitcher[6])
-				rest_of_pitcher_data = pitcher[7:]
-				relevant_pitcher_data = [win_loss_ratio] + rest_of_pitcher_data
-				features += relevant_pitcher_data
+				if(pitcher != None):
+					if(int(pitcher[6]) > 0):
+						win_loss_ratio = int(pitcher[5])/int(pitcher[6])
+					else:
+						win_loss_ratio = 0
+					rest_of_pitcher_data = pitcher[7:]
+					relevant_pitcher_data = [win_loss_ratio] + rest_of_pitcher_data
+					features += relevant_pitcher_data
 				# End of 'Getting features'
 				
 				# Making output				
