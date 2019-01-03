@@ -102,7 +102,6 @@ def normalize(file_name):
 
 	minimums = column_minimums(with_pitcher)
 	ranges = column_ranges(with_pitcher)
-
 	# Subtract the minimum of the column and divide by the maximum of the column
 	# for each entry, such that they are in [0, 1].
 	min_subtracted = [elementwise_subtraction(row, minimums) for row in with_pitcher]
@@ -120,21 +119,57 @@ def make_neural_net(file_name):
 								different years or whatever.
 	runtime: long :))
 	'''
+
+	def index_of_label(score, num_labels):
+		'''
+		inputs: 
+			score: the score of the player; ranges between [0, 1]
+			num_labels: this is how many lables there are total
+		outputs: a 1D numpy array of length n=num_labels, with either 0s in all spots except
+						 for one 1; this 1 will indicate the category of this label
+		'''
+		interval_size = 1/num_labels # the range that each label sweeps over; made constant for simplicity
+		return min([int(score/interval_size), num_labels-1])
+
+		
 	TRAINING_PROPORTION = .8 # the proportion of the data used for training
 	
 	# Loads data into the training and test sets necessary
 	normalized_data = np.array(normalize(file_name))
 	np.random.shuffle(normalized_data) # shuffle the rows randomly
+
 	num_training = int(TRAINING_PROPORTION*(normalized_data.shape[0])) # number of training rows
 	num_test = normalized_data.shape[0]-num_training # number of test rows
 	training_data, test_data = normalized_data[:num_training+1], normalized_data[num_training+1:]
 	training_features, test_features = training_data[:, [i for i in range(27)]], test_data[:, [i for i in range(27)]]
-	training_labels, test_labels = training_data[:, [27]], test_data[:, [27]]
-	
-	# Now making the model
-	# model = keras.Sequential([
-	# 	keras.layers.Flatten])
-	
-	
+
+	training_labels, test_labels = training_data[:, 27], test_data[:, 27]
+	# Converting [0, 1] scores into a numpy bit vector, where 1 is True and 0 is False for classification
+	training_labels = np.array([index_of_label(score, 10) for score in training_labels])
+
+	test_labels = np.array([index_of_label(score, 10) for score in test_labels])
+
+	with tf.device('/device:GPU:1'):
+		# Now making a neural net out of the training set
+		model = keras.Sequential([
+			keras.layers.Dense(num_training, activation="relu", input_shape=(27,)),
+			keras.layers.Dense(128, activation=tf.nn.relu),
+			keras.layers.Dense(400, activation=tf.nn.relu),
+		  keras.layers.Dense(2000, activation=tf.nn.relu),
+			keras.layers.Dense(10, activation=tf.nn.softmax)])
+
+		
+		# Compiling the model
+		model.compile(optimizer="adam",
+									loss='sparse_categorical_crossentropy',
+									metrics=['accuracy'])
+		
+
+		# Training the model
+		model.fit(training_features, training_labels, epochs=100)
+		test_loss, test_acc = model.evaluate(test_features, test_labels)
+		print('Test accuracy:', test_acc)
+
+
 if __name__ == '__main__':
 	make_neural_net('Mike Trout.csv')
