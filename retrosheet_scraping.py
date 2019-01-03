@@ -223,7 +223,7 @@ def batter_to_csv(player_name, urls):
 				# End of making output
 				
 				# append features and output, in that order, to the csv file
-				csv_writer.writerow([features + output])
+				csv_writer.writerow(features + output)
 
 		
 		
