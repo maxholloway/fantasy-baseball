@@ -1,7 +1,17 @@
 from bs4 import BeautifulSoup
 import requests
 from csv import writer, reader
-from dict_tools import reverse_dict
+
+def reverse_dict(d):
+	'''
+	inputs: a dictionary (d)
+	outputs: another dictionary where the keys are the values
+	runtime: O(N) time and space, where N is the length of the dictionary
+	'''
+	newDict = {}
+	for key, val in d.items():
+		newDict[val] = key
+	return newDict
 
 abbreviation_to_team = {'ANA': 'Anaheim Angels', 'ARI': 'Arizona Diamondbacks',
 												'ATL': 'Atlanta Braves', 'BAL': 'Baltimore Orioles',
