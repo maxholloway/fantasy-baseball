@@ -11,7 +11,7 @@ recorded factors, such as the pitcher, the time of year, the weather,
 the location (home vs away), and others.
 
 In an effort to make educated guesses on the performance of the 
-guessing, we developed a simple model.
+players, we developed a simple model.
 
 1.) Train a neural net for every batter, using a training set taken from
     every game they've played (using both the Lahman dataset and 
@@ -22,3 +22,4 @@ guessing, we developed a simple model.
 
 Although this is a simple process, it will hopefully provide at least 
 marginally better results than computing the average.
+
