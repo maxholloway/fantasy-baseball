@@ -172,8 +172,13 @@ def batter_to_csv(player_name, urls):
 			game_links += ['https://www.retrosheet.org/boxesetc' + anchors[j].get('href')[2:]] if j%2 == 1 else []
 			
 		## ---- Making the header names for the csv file ---- ##
-		header_names = text_table[0].split() # headers for csv
-		header_names[1] = 'Home' # 1 if home, 0 if away
+		if(i == 0):
+			column_titles = text_table[0].split() # headers for csv
+			column_titles[1] = 'Home' # 1 if home, 0 if away
+			column_titles += ['Draftkings Score']
+			# print('Header names: ', column_titles)
+			# print('length of header names: ', len(column_titles))
+			with open(player_name + '.csv', 'w') as csv_file: writer(csv_file).writerow(column_titles)
 
 		## ---- Making a list of game strings for the csv file ---- ##
 		games = text_table[1:] # all of the rows after the headers; needs cleaned up
@@ -181,7 +186,7 @@ def batter_to_csv(player_name, urls):
 		# or that are empty, because these rows do not represent actual games
 		games = list(filter((lambda x: ('Date' not in x) and (x.split() != [])), games))
 
-		with open(player_name + '.csv', 'w' if(i==0) else 'a') as csv_file:
+		with open(player_name + '.csv', 'a') as csv_file:
 			csv_writer = writer(csv_file)
 			
 			for j in range(len(games)):
@@ -229,7 +234,7 @@ def batter_to_csv(player_name, urls):
 					batter_data = [singles, doubles, triples, home_runs, rbis, runs, bb, hbp, stolen_bases]
 					batter_data = list(map((lambda x: int(x)), batter_data)) # convert from string to int
 					score = stats_to_draftkings_score(batter_data, 'hitter')
-					output += [score]
+					output = [score]
 				# End of making output
 				
 				# append features and output, in that order, to the csv file
@@ -254,7 +259,7 @@ if __name__ == '__main__':
 									'https://www.retrosheet.org/boxesetc/2014/Itroum0010042014.htm',
 									'https://www.retrosheet.org/boxesetc/2015/Itroum0010052015.htm',
 									'https://www.retrosheet.org/boxesetc/2016/Itroum0010062016.htm',
-									'https://www.retrosheet.org/boxesetc/2017/Itroum0010072017.htm',
-									'https://www.retrosheet.org/boxesetc/2018/Itroum0010082018.htm']
+									'https://www.retrosheet.org/boxesetc/2017/Itroum0010072017.htm']
+									# 'https://www.retrosheet.org/boxesetc/2018/Itroum0010082018.htm'] # does not include pitching data
 	name_for_trout = 'Mike Trout'
 	batter_to_csv(name_for_trout, urlsForTrout)
