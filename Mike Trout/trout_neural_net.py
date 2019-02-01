@@ -32,8 +32,12 @@ def make_neural_net(file_name):
 		return day + 30.5 * (month + 12 * year)
 
 	df = pd.read_csv("Mike Trout.csv", dtype=str) # make a dataframe of Mike Trout's data
+	df = df.dropna() # remove all rows with nan's
 	df['Date'] = df['Date'].apply(non_modular_date); # convert the dates from modular to regular
-	df.astype('float32')
+
+	# Converts all values to numerics
+	for col_name in df.columns.values:
+		df[col_name] = pd.to_numeric(df[col_name])
 
 	#### NOT MY CODE ####
 	training_data_df, test_data_df = train_test_split(df, test_size=TESTING_PROPORTION)
@@ -61,8 +65,8 @@ def make_neural_net(file_name):
 
 	# Define model parameters
 	learning_rate = 0.001
-	training_epochs = 100
-	display_step = 5
+	training_epochs = 40
+	# display_step = 5
 
 	# Define how many inputs and outputs are in our neural network
 	number_of_inputs = 27
@@ -127,16 +131,16 @@ def make_neural_net(file_name):
 		# One epoch is one full run through the training data set.
 		for epoch in range(training_epochs):
 
-			if (epoch % 5 == 0):
-				training_cost = session.run(cost, feed_dict={X: X_scaled_training, Y: Y_scaled_training})
-				testing_cost = session.run(cost, feed_dict={X: X_scaled_testing, Y: Y_scaled_testing})
-				print(epoch, training_cost, testing_cost)
+			# if (epoch % 5 == 0):
+			# 	training_cost = session.run(cost, feed_dict={X: X_scaled_training, Y: Y_scaled_training})
+			# 	testing_cost = session.run(cost, feed_dict={X: X_scaled_testing, Y: Y_scaled_testing})
+			# 	print(epoch, training_cost, testing_cost)
 
 			# Feed in the training data and do one step of neural network training
 			session.run(optimizer, feed_dict={X: X_scaled_training, Y: Y_scaled_training})
 
 			# Print the current training status to the screen
-			print("Training pass: {}".format(epoch))
+			# print("Training pass: {}".format(epoch))
 
 		# Training is now complete!
 		print("Training is complete!")
