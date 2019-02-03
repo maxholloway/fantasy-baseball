@@ -179,7 +179,9 @@ def batter_to_csv(player_name, urls):
 			column_titles[2] = 'BP' # makes this the batting position
 			column_titles[3] = 'seasonal_dk_points_avg'
 			column_titles[4] = 'total_dk_points_avg'
-			column_titles[5:] = ['pitcher data ' + str(k) for k in range(1, 25)]
+			column_titles[5] = 'last_game_dk_score'
+			column_titles[6] = 'avg_last_5_games_dk_score'
+			column_titles[7:] = ['pitcher data ' + str(k) for k in range(1, 25)]
 			column_titles += ['Draftkings Score']
 
 			with open(player_name + '.csv', 'w') as csv_file: writer(csv_file).writerow(column_titles)
@@ -193,6 +195,7 @@ def batter_to_csv(player_name, urls):
 		with open(player_name + '.csv', 'a') as csv_file:
 			csv_writer = writer(csv_file)
 			
+			last_5_scores = []
 			seasonal_dk_points = 0
 			for j in range(len(games)):
 				game = games[j] # the batting info for the game
@@ -216,7 +219,12 @@ def batter_to_csv(player_name, urls):
 				seasonal_dk_points_avg = 0 if(j == 0) else seasonal_dk_points/j
 				lifetime_dk_points_avg = 0 if(total_games == 0) else total_dk_points/total_games
 				
-				features += [date, home, batting_position, seasonal_dk_points_avg, lifetime_dk_points_avg]
+				# Get last game and average of last 5 games draftkings scores
+				last_5_games_avg = 0 if len(last_5_scores) == 0 else sum(last_5_scores)/len(last_5_scores)
+				last_game_dk_score = 0 if len(last_5_scores) == 0 else last_5_scores[-1]
+				
+				
+				features += [date, home, batting_position, seasonal_dk_points_avg, lifetime_dk_points_avg, last_game_dk_score, last_5_games_avg]
 				## End of 'Getting gameday features'
 				
 				# Getting data on how the pitcher performed that same year
@@ -246,6 +254,10 @@ def batter_to_csv(player_name, urls):
 					score = stats_to_draftkings_score(batter_data, 'hitter')
 					seasonal_dk_points += score
 					total_dk_points += score
+					if(len(last_5_scores) < 5):
+						last_5_scores += [score]
+					else:
+						last_5_scores = last_5_scores[1:] + [score]
 					output = [score]
 				# End of making output
 				
