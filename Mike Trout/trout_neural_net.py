@@ -1,12 +1,13 @@
-import csv
-import numpy as np
+import random
+
 import tensorflow as tf
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
+from csv import writer, reader
 
 ######################### Creating the Neural Net #########################
-def make_neural_net(file_name):
+def make_neural_net(file_name, learning_rate, training_epochs, layers):
 	'''
 	inputs: the name of the csv file with the player's data
 	outputs: a neural net object that is trained with the 80% of the data
@@ -16,7 +17,9 @@ def make_neural_net(file_name):
 								different years or whatever.
 	runtime: long :))
 	'''
-	
+
+	assert len(layers) == 9
+
 	TESTING_PROPORTION = .2 # the proportion of the data used for training
 	
 	# Loads data into the training and test sets necessary
@@ -63,19 +66,11 @@ def make_neural_net(file_name):
 	X_scaled_testing = X_scaler.transform(X_testing)
 	Y_scaled_testing = Y_scaler.transform(Y_testing)
 
-	# Define model parameters
-	learning_rate = 0.001
-	training_epochs = 40
-	# display_step = 5
 
-	# Define how many inputs and outputs are in our neural network
-	number_of_inputs = 27
-	number_of_outputs = 1
+	# Defines number of inputs and number of nodes in all of the layers
+	number_of_inputs, layer_1_nodes, layer_2_nodes, layer_3_nodes,\
+	layer_4_nodes, layer_5_nodes, layer_6_nodes, layer_7_nodes, number_of_outputs = layers
 
-	# Define how many neurons we want in each layer of our neural network
-	layer_1_nodes = 50
-	layer_2_nodes = 100
-	layer_3_nodes = 50
 
 	# Section One: Define the layers of the neural network itself
 
@@ -84,7 +79,7 @@ def make_neural_net(file_name):
 		X = tf.placeholder(tf.float32, shape=(None, number_of_inputs))
 
 	# Layer 1
-	with tf.variable_scope('layer_1'):
+	with tf.variable_scope('layer_1', reuse=False):
 		weights = tf.get_variable(name="weights1", shape=[number_of_inputs, layer_1_nodes],
 															initializer=tf.contrib.layers.xavier_initializer())
 		biases = tf.get_variable(name="biases1", shape=[layer_1_nodes], initializer=tf.zeros_initializer())
@@ -104,12 +99,40 @@ def make_neural_net(file_name):
 		biases = tf.get_variable(name="biases3", shape=[layer_3_nodes], initializer=tf.zeros_initializer())
 		layer_3_output = tf.nn.relu(tf.matmul(layer_2_output, weights) + biases)
 
+	# Layer 4
+	with tf.variable_scope('layer_4'):
+		weights = tf.get_variable(name="weights4", shape=[layer_3_nodes, layer_4_nodes],
+															initializer=tf.contrib.layers.xavier_initializer())
+		biases = tf.get_variable(name="biases4", shape=[layer_4_nodes], initializer=tf.zeros_initializer())
+		layer_4_output = tf.nn.relu(tf.matmul(layer_3_output, weights) + biases)
+
+	# Layer 5
+	with tf.variable_scope('layer_5'):
+		weights = tf.get_variable(name="weights5", shape=[layer_4_nodes, layer_5_nodes],
+															initializer=tf.contrib.layers.xavier_initializer())
+		biases = tf.get_variable(name="biases5", shape=[layer_5_nodes], initializer=tf.zeros_initializer())
+		layer_5_output = tf.nn.relu(tf.matmul(layer_4_output, weights) + biases)
+
+	# Layer 6
+	with tf.variable_scope('layer_6'):
+		weights = tf.get_variable(name="weights6", shape=[layer_5_nodes, layer_6_nodes],
+															initializer=tf.contrib.layers.xavier_initializer())
+		biases = tf.get_variable(name="biases6", shape=[layer_6_nodes], initializer=tf.zeros_initializer())
+		layer_6_output = tf.nn.relu(tf.matmul(layer_5_output, weights) + biases)
+
+	# Layer 7
+	with tf.variable_scope('layer_7'):
+		weights = tf.get_variable(name="weights7", shape=[layer_6_nodes, layer_7_nodes],
+															initializer=tf.contrib.layers.xavier_initializer())
+		biases = tf.get_variable(name="biases7", shape=[layer_7_nodes], initializer=tf.zeros_initializer())
+		layer_7_output = tf.nn.relu(tf.matmul(layer_6_output, weights) + biases)
+
 	# Output Layer
 	with tf.variable_scope('output'):
-		weights = tf.get_variable(name="weights4", shape=[layer_3_nodes, number_of_outputs],
+		weights = tf.get_variable(name="weights8", shape=[layer_7_nodes, number_of_outputs],
 															initializer=tf.contrib.layers.xavier_initializer())
-		biases = tf.get_variable(name="biases4", shape=[number_of_outputs], initializer=tf.zeros_initializer())
-		prediction = tf.matmul(layer_3_output, weights) + biases
+		biases = tf.get_variable(name="biases8", shape=[number_of_outputs], initializer=tf.zeros_initializer())
+		prediction = tf.matmul(layer_7_output, weights) + biases
 
 	# Section Two: Define the cost function of the neural network that will measure prediction accuracy during training
 
@@ -143,13 +166,22 @@ def make_neural_net(file_name):
 			# print("Training pass: {}".format(epoch))
 
 		# Training is now complete!
+		#### END OF NOT MY CODE ####
+
 		print("Training is complete!")
 		final_training_cost = session.run(cost, feed_dict={X: X_scaled_training, Y: Y_scaled_training})
 		final_testing_cost = session.run(cost, feed_dict={X: X_scaled_testing, Y: Y_scaled_testing})
 		print("Training: ", final_training_cost, "\nTesting: ", final_testing_cost)
-#### END OF NOT MY CODE ####
+
+		with open('Log.csv', 'a') as csv_file:
+			writer(csv_file).writerow([layers, learning_rate, training_epochs, final_training_cost, final_testing_cost, 0.03555387959152568])
+
+
 
 
 
 if __name__ == '__main__':
-	make_neural_net('Mike Trout.csv')
+	for i in range(1):
+		layers = [random.randint(20, 100) for j in range(7)] # random number of nodes in each layer
+		num_epochs = random.randint(35, 75)
+		make_neural_net('Mike Trout.csv', .001, num_epochs, [27] + layers + [1])
