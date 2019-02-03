@@ -20,7 +20,7 @@ def make_neural_net(file_name, learning_rate, training_epochs, layers):
 
 	assert len(layers) == 9
 
-	TESTING_PROPORTION = .2 # the proportion of the data used for training
+	TESTING_PROPORTION = .1 # the proportion of the data used for training
 	
 	# Loads data into the training and test sets necessary
 	def non_modular_date(date):
@@ -172,6 +172,7 @@ def make_neural_net(file_name, learning_rate, training_epochs, layers):
 		final_training_cost = session.run(cost, feed_dict={X: X_scaled_training, Y: Y_scaled_training})
 		final_testing_cost = session.run(cost, feed_dict={X: X_scaled_testing, Y: Y_scaled_testing})
 		print("Training: ", final_training_cost, "\nTesting: ", final_testing_cost)
+		print("Succeeded by: ", 0.03555387959152568 - final_testing_cost)
 
 		with open('Log.csv', 'a') as csv_file:
 			writer(csv_file).writerow([layers, learning_rate, training_epochs, final_training_cost, final_testing_cost, 0.03555387959152568])
@@ -183,5 +184,7 @@ def make_neural_net(file_name, learning_rate, training_epochs, layers):
 if __name__ == '__main__':
 	for i in range(1):
 		layers = [random.randint(20, 100) for j in range(7)] # random number of nodes in each layer
-		num_epochs = random.randint(35, 75)
-		make_neural_net('Mike Trout.csv', .001, num_epochs, [27] + layers + [1])
+		# layers = [48, 52, 34, 75, 83, 56, 20]
+		# num_epochs = random.randint(35, 75)
+		num_epochs = 50
+		make_neural_net('Mike Trout.csv', .001, num_epochs, [31] + layers + [1])
