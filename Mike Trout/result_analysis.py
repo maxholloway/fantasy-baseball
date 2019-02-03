@@ -20,3 +20,4 @@ if __name__ == '__main__':
 	mse = se/len(scaled_scores)
 
 	print('If we guess that Mike Trout will perform average every time,\nthen the mean-squared error is', str(mse)+'.\n')
+	# Results in 0.03555387959152568
