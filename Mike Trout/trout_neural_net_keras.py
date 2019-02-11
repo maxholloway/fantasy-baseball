@@ -56,7 +56,7 @@ def make_neural_net(file_name, learn_rate, training_epochs, layers, model_name, 
 
 
 if __name__ == '__main__':
-  for i in range(2):
+  for i in range(500):
     net_name = 'Neural net #{}.h5'.format(i+1)
     num_epochs = random.randint(75, 100)
     layers = [random.randint(20, 100) for j in range(7)]  # random number of nodes in each layer
