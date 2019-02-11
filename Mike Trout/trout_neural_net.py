@@ -178,9 +178,6 @@ def make_neural_net(file_name, learning_rate, training_epochs, layers):
 			writer(csv_file).writerow([layers, learning_rate, training_epochs, final_training_cost, final_testing_cost, 0.03555387959152568])
 
 
-
-
-
 if __name__ == '__main__':
 	for i in range(1):
 		layers = [random.randint(20, 100) for j in range(7)] # random number of nodes in each layer
