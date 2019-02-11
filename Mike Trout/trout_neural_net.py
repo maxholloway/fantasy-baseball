@@ -1,10 +1,9 @@
 import random
-
 import tensorflow as tf
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
-from csv import writer, reader
+from csv import writer
 
 ######################### Creating the Neural Net #########################
 def make_neural_net(file_name, learning_rate, training_epochs, layers):
@@ -34,13 +33,17 @@ def make_neural_net(file_name, learning_rate, training_epochs, layers):
 
 		return day + 30.5 * (month + 12 * year)
 
-	df = pd.read_csv("Mike Trout.csv", dtype=str) # make a dataframe of Mike Trout's data
-	df = df.dropna() # remove all rows with nan's
-	df['Date'] = df['Date'].apply(non_modular_date); # convert the dates from modular to regular
+	def make_dataframe(f_name):
+		df = pd.read_csv(f_name, dtype=str) # make a dataframe of Mike Trout's data
+		df = df.dropna() # remove all rows with nan's
+		df['Date'] = df['Date'].apply(non_modular_date); # convert the dates from modular to regular
 
-	# Converts all values to numerics
-	for col_name in df.columns.values:
-		df[col_name] = pd.to_numeric(df[col_name])
+		# Converts all values to numerics
+		for col_name in df.columns.values:
+			df[col_name] = pd.to_numeric(df[col_name])
+		return df
+
+	df = make_dataframe(file_name)
 
 	#### NOT MY CODE ####
 	training_data_df, test_data_df = train_test_split(df, test_size=TESTING_PROPORTION)
@@ -154,11 +157,6 @@ def make_neural_net(file_name, learning_rate, training_epochs, layers):
 		# One epoch is one full run through the training data set.
 		for epoch in range(training_epochs):
 
-			# if (epoch % 5 == 0):
-			# 	training_cost = session.run(cost, feed_dict={X: X_scaled_training, Y: Y_scaled_training})
-			# 	testing_cost = session.run(cost, feed_dict={X: X_scaled_testing, Y: Y_scaled_testing})
-			# 	print(epoch, training_cost, testing_cost)
-
 			# Feed in the training data and do one step of neural network training
 			session.run(optimizer, feed_dict={X: X_scaled_training, Y: Y_scaled_training})
 
@@ -179,9 +177,8 @@ def make_neural_net(file_name, learning_rate, training_epochs, layers):
 
 
 if __name__ == '__main__':
-	for i in range(1):
-		layers = [random.randint(20, 100) for j in range(7)] # random number of nodes in each layer
-		# layers = [48, 52, 34, 75, 83, 56, 20]
-		# num_epochs = random.randint(35, 75)
-		num_epochs = 50
-		make_neural_net('Mike Trout.csv', .001, num_epochs, [31] + layers + [1])
+	layers = [random.randint(20, 100) for j in range(7)] # random number of nodes in each layer
+	# layers = [48, 52, 34, 75, 83, 56, 20]
+	# num_epochs = random.randint(35, 75)
+	num_epochs = 50
+	make_neural_net('Mike Trout.csv', .001, num_epochs, [31] + layers + [1])
