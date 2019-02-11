@@ -5,7 +5,7 @@ import numpy as np
 import helper_functions as hf
 
 ######################### Creating the Neural Net #########################
-def make_neural_net(file_name, learn_rate, training_epochs, layers, model_name, drop_rate=.3):
+def make_neural_net(file_name, learn_rate, training_epochs, layers, model_name, drop_rate=.3, testing_proportion=.1):
   '''
   inputs: the name of the csv file with the player's data
   outputs: a neural net object that is trained with the 80% of the data
@@ -18,12 +18,11 @@ def make_neural_net(file_name, learn_rate, training_epochs, layers, model_name, 
 
   assert len(layers) == 9
 
-  TESTING_PROPORTION = .1  # the proportion of the data used for training
 
   df = hf.make_dataframe(file_name)
 
  # Scale both the testing and training inputs and outputs
-  X_scaled_training, Y_scaled_training, X_scaled_testing, Y_scaled_testing = hf.make_train_test(df, TESTING_PROPORTION)
+  X_scaled_training, Y_scaled_training, X_scaled_testing, Y_scaled_testing = hf.make_train_test(df, testing_proportion)
 
 
   # Constructing the neural network's layers/defining the model
@@ -62,4 +61,5 @@ if __name__ == '__main__':
     num_epochs = random.randint(75, 100)
     layers = [random.randint(20, 100) for j in range(7)]  # random number of nodes in each layer
     dropout_rate = .2 + .4*np.random.random() # range of dropout rate: [.2, .6)
-    make_neural_net('Mike Trout.csv', .001, num_epochs, [31] + layers + [1], net_name, drop_rate=dropout_rate)
+    make_neural_net('Mike Trout.csv', .001, num_epochs, [31] + layers + [1],
+                    net_name, drop_rate=dropout_rate, testing_proportion=.1)
